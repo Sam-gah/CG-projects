@@ -18,6 +18,7 @@ void drawEllipse(int x, int y, int a, int b)
 {
     ellipse(x, y, 0, 360, a, b);
 }
+
 int myRound(double x)
 {
     return (int)(x >= 0 ? x + 0.5 : x - 0.5);
@@ -25,44 +26,48 @@ int myRound(double x)
 
 void performTransformation(int *x, int *y, int size, int tx, int ty)
 {
-
+    // Perform translation
     *x += tx;
     *y += ty;
 }
 
 void performRotation(int *x, int *y, int size, int angle)
 {
-
+    // Calculate center of the square
     int centerX = *x + size / 2;
     int centerY = *y + size / 2;
 
+    // Convert angle from degrees to radians
     double radians = (double)angle * M_PI / 180.0;
 
+    // Perform rotation around the center
     int tempX = *x;
     *x = centerX + myRound((tempX - centerX) * cos(radians) - (*y - centerY) * sin(radians));
     *y = centerY + myRound((tempX - centerX) * sin(radians) + (*y - centerY) * cos(radians));
 }
+
 void scaleObject(int *size)
 {
     char ch;
-    int scalingFactor = 5;
+    int scalingFactor = 5; // Adjust the scaling factor to change the rate of scaling
 
     do
     {
         cleardevice();
         drawSquare(getmaxx() / 2 - (*size) / 2, getmaxy() / 2 - (*size) / 2, *size);
 
+        // Print scaling instructions
         printf("\nUse '+' to zoom in and '-' to zoom out (Press 'q' to exit scaling mode).\n");
 
         ch = getch();
         if (ch == '+')
         {
-
+            // Zoom in (increase size)
             *size += scalingFactor;
         }
         else if (ch == '-')
         {
-
+            // Zoom out (decrease size)
             if (*size > scalingFactor)
             {
                 *size -= scalingFactor;
@@ -76,21 +81,25 @@ int main()
     int gd = DETECT, gm;
     initgraph(&gd, &gm, "C:\\Turboc3\\BGI");
 
-    int x, y;
-    int size = 100;
+    int x, y;       // Initial position of the square
+    int size = 100; // Initial size of the square
 
+    // Ask the user for initial coordinates
     printf("Enter the initial position (x y) of the square: ");
     scanf("%d %d", &x, &y);
 
+    // Draw the initial square
     drawSquare(x, y, size);
-
-    printf("Initial square drawn at position (%d, %d) with size %d.\n", x, y, size);
 
     int choice;
     int exitFlag = 0;
 
     while (!exitFlag)
     {
+        // Clear the screen
+        cleardevice();
+        drawSquare(x, y, size);
+
         // Display the menu options
         printf("\nUse the following options to interact with the square:\n");
         printf("1. Change Coordinates\n");
@@ -131,33 +140,28 @@ int main()
 
         case 4:
             printf("You chose: 2D to 3D Scaling\n");
-
+            // Call the scaling function
             scaleObject(&size);
             break;
 
         case 5:
             printf("You chose: Draw Circle Inside Square\n");
-
+            // Calculate the center of the square
             int centerX_circle = x + size / 2;
             int centerY_circle = y + size / 2;
-
+            // Calculate the radius to fit inside the square
             int radius_circle = size / 2;
-
+            // Draw the circle
             drawCircle(centerX_circle, centerY_circle, radius_circle);
             break;
 
         case 6:
-
             printf("You chose: Draw Ellipse Inside Square\n");
-
+            // Calculate the center of the square
             int centerX_ellipse = x + size / 2;
             int centerY_ellipse = y + size / 2;
-
-            int a_ellipse = size / 2;
-            int b_ellipse = size / 4;
-
+            // Calculate the major and minor axes to fit inside the square
             cleardevice();
-            drawSquare(x, y, size);
 
             drawEllipse(centerX_ellipse, centerY_ellipse, a_ellipse, b_ellipse);
             break;
@@ -172,10 +176,12 @@ int main()
             break;
         }
 
-        cleardevice();
-        drawSquare(x, y, size);
+        // Wait for a key press before clearing the screen
+        printf("Press any key to continue...\n");
+        getch();
     }
 
+    // Close the graphics window gracefully
     closegraph();
-    return 0;
+    return 0; 
 }
